@@ -305,17 +305,17 @@ wit-bindgen-rt = { version = "0.38.0", default-features = false }
 wit-bindgen-rust-macro = { version = "0.38.0", default-features = false }
 
 # wasm-tools family:
-wasmparser = { version = "0.224.0", default-features = false, features = ['simd'] }
-wat = "1.224.0"
-wast = "224.0.0"
-wasmprinter = "0.224.0"
-wasm-encoder = "0.224.0"
-wasm-smith = "0.224.0"
-wasm-mutate = "0.224.0"
-wit-parser = "0.224.0"
-wit-component = "0.224.0"
-wasm-wave = "0.224.0"
-wasm-compose = "0.224.0"
+wasmparser = { version = "0.225.0", default-features = false, features = ['simd'] }
+wat = "1.225.0"
+wast = "225.0.0"
+wasmprinter = "0.225.0"
+wasm-encoder = "0.225.0"
+wasm-smith = "0.225.0"
+wasm-mutate = "0.225.0"
+wit-parser = "0.225.0"
+wit-component = "0.225.0"
+wasm-wave = "0.225.0"
+wasm-compose = "0.225.0"
 
 # Non-Bytecode Alliance maintained dependencies:
 # --------------------------
@@ -569,18 +569,3 @@ opt-level = 's'
 inherits = "release"
 codegen-units = 1
 lto = true
-
-# TODO: Remove these patches once wasm-tools 1.225 is available:
-[patch.crates-io]
-wasmparser = { git = "https://github.com/bytecodealliance/wasm-tools" }
-wasm-metadata = { git = "https://github.com/bytecodealliance/wasm-tools" }
-wat = { git = "https://github.com/bytecodealliance/wasm-tools" }
-wast = { git = "https://github.com/bytecodealliance/wasm-tools" }
-wasmprinter = { git = "https://github.com/bytecodealliance/wasm-tools" }
-wasm-encoder = { git = "https://github.com/bytecodealliance/wasm-tools" }
-wasm-smith = { git = "https://github.com/bytecodealliance/wasm-tools" }
-wasm-mutate = { git = "https://github.com/bytecodealliance/wasm-tools" }
-wit-parser = { git = "https://github.com/bytecodealliance/wasm-tools" }
-wit-component = { git = "https://github.com/bytecodealliance/wasm-tools" }
-wasm-wave = { git = "https://github.com/bytecodealliance/wasm-tools" }
-
