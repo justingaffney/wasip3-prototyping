@@ -2778,8 +2778,6 @@ pub(crate) fn start_call<'a, T: Send, LowerParams: Copy, R: 'static>(
     lift_context: LiftLowerContext,
     handle: Func,
 ) -> Result<(Promise<R>, StoreContextMut<'a, T>)> {
-    // TODO: Check to see if the callee is using the memory64 ABI, in which case we must use task_return_type64.
-    // How do we check that?
     let func_data = &store.0[handle.0];
     let task_return_type = func_data.types[func_data.ty].results;
     let is_concurrent = func_data.options.async_();
