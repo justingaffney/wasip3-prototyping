@@ -5,7 +5,10 @@ use core::pin::pin;
 use core::task::Poll;
 
 use std::net::Shutdown;
+
+#[cfg(not(target_os = "windows"))]
 use std::os::fd::{AsFd as _, BorrowedFd};
+
 use std::sync::Arc;
 
 use cap_net_ext::AddressFamily;
@@ -231,6 +234,7 @@ impl TcpSocket {
         }
     }
 
+    #[cfg(not(target_os = "windows"))]
     pub fn as_fd(&self) -> Result<BorrowedFd<'_>, ErrorCode> {
         match &self.tcp_state {
             TcpState::Default(socket) | TcpState::Bound(socket) => Ok(socket.as_fd()),
@@ -314,24 +318,48 @@ impl TcpSocket {
         }
     }
 
+    #[cfg(target_os = "windows")]
+    pub fn keep_alive_enabled(&self) -> Result<bool, ErrorCode> {
+        Err(ErrorCode::NotSupported)
+    }
+
+    #[cfg(not(target_os = "windows"))]
     pub fn keep_alive_enabled(&self) -> Result<bool, ErrorCode> {
         let fd = self.as_fd()?;
         let v = sockopt::get_socket_keepalive(fd)?;
         Ok(v)
     }
 
+    #[cfg(target_os = "windows")]
+    pub fn set_keep_alive_enabled(&self, value: bool) -> Result<(), ErrorCode> {
+        Err(ErrorCode::NotSupported)
+    }
+
+    #[cfg(not(target_os = "windows"))]
     pub fn set_keep_alive_enabled(&self, value: bool) -> Result<(), ErrorCode> {
         let fd = self.as_fd()?;
         sockopt::set_socket_keepalive(fd, value)?;
         Ok(())
     }
 
+    #[cfg(target_os = "windows")]
+    pub fn keep_alive_idle_time(&self) -> Result<Duration, ErrorCode> {
+        Err(ErrorCode::NotSupported)
+    }
+
+    #[cfg(not(target_os = "windows"))]
     pub fn keep_alive_idle_time(&self) -> Result<Duration, ErrorCode> {
         let fd = self.as_fd()?;
         let v = sockopt::get_tcp_keepidle(fd)?;
         Ok(v.as_nanos().try_into().unwrap_or(u64::MAX))
     }
 
+    #[cfg(target_os = "windows")]
+    pub fn set_keep_alive_idle_time(&mut self, value: Duration) -> Result<(), ErrorCode> {
+        Err(ErrorCode::NotSupported)
+    }
+
+    #[cfg(not(target_os = "windows"))]
     pub fn set_keep_alive_idle_time(&mut self, value: Duration) -> Result<(), ErrorCode> {
         const NANOS_PER_SEC: u64 = 1_000_000_000;
 
@@ -356,12 +384,24 @@ impl TcpSocket {
         Ok(())
     }
 
+    #[cfg(target_os = "windows")]
+    pub fn keep_alive_interval(&self) -> Result<Duration, ErrorCode> {
+        Err(ErrorCode::NotSupported)
+    }
+
+    #[cfg(not(target_os = "windows"))]
     pub fn keep_alive_interval(&self) -> Result<Duration, ErrorCode> {
         let fd = self.as_fd()?;
         let v = sockopt::get_tcp_keepintvl(fd)?;
         Ok(v.as_nanos().try_into().unwrap_or(u64::MAX))
     }
 
+    #[cfg(target_os = "windows")]
+    pub fn set_keep_alive_interval(&self, value: Duration) -> Result<(), ErrorCode> {
+        Err(ErrorCode::NotSupported)
+    }
+
+    #[cfg(not(target_os = "windows"))]
     pub fn set_keep_alive_interval(&self, value: Duration) -> Result<(), ErrorCode> {
         // Ensure that any fractional value passed to the actual syscall never gets rounded down to 0.
         const MIN_SECS: core::time::Duration = core::time::Duration::from_secs(1);
@@ -381,12 +421,24 @@ impl TcpSocket {
         Ok(())
     }
 
+    #[cfg(target_os = "windows")]
+    pub fn keep_alive_count(&self) -> Result<u32, ErrorCode> {
+        Err(ErrorCode::NotSupported)
+    }
+
+    #[cfg(not(target_os = "windows"))]
     pub fn keep_alive_count(&self) -> Result<u32, ErrorCode> {
         let fd = self.as_fd()?;
         let v = sockopt::get_tcp_keepcnt(fd)?;
         Ok(v)
     }
 
+    #[cfg(target_os = "windows")]
+    pub fn set_keep_alive_count(&self, value: u32) -> Result<(), ErrorCode> {
+        Err(ErrorCode::NotSupported)
+    }
+
+    #[cfg(not(target_os = "windows"))]
     pub fn set_keep_alive_count(&self, value: u32) -> Result<(), ErrorCode> {
         const MIN_CNT: u32 = 1;
         // Cap it at Linux' maximum, which appears to have the lowest limit across our supported platforms.
@@ -401,6 +453,12 @@ impl TcpSocket {
         Ok(())
     }
 
+    #[cfg(target_os = "windows")]
+    pub fn hop_limit(&self) -> Result<u8, ErrorCode> {
+        Err(ErrorCode::NotSupported)
+    }
+
+    #[cfg(not(target_os = "windows"))]
     pub fn hop_limit(&self) -> Result<u8, ErrorCode> {
         let fd = self.as_fd()?;
         match self.family {
@@ -418,6 +476,12 @@ impl TcpSocket {
         }
     }
 
+    #[cfg(target_os = "windows")]
+    pub fn set_hop_limit(&self, value: u8) -> Result<(), ErrorCode> {
+        Err(ErrorCode::NotSupported)
+    }
+
+    #[cfg(not(target_os = "windows"))]
     pub fn set_hop_limit(&self, value: u8) -> Result<(), ErrorCode> {
         let fd = self.as_fd()?;
         if value == 0 {
@@ -444,12 +508,24 @@ impl TcpSocket {
         Ok(())
     }
 
+    #[cfg(target_os = "windows")]
+    pub fn receive_buffer_size(&self) -> Result<u64, ErrorCode> {
+        Err(ErrorCode::NotSupported)
+    }
+
+    #[cfg(not(target_os = "windows"))]
     pub fn receive_buffer_size(&self) -> Result<u64, ErrorCode> {
         let fd = self.as_fd()?;
         let v = sockopt::get_socket_recv_buffer_size(fd)?;
         Ok(normalize_get_buffer_size(v).try_into().unwrap_or(u64::MAX))
     }
 
+    #[cfg(target_os = "windows")]
+    pub fn set_receive_buffer_size(&mut self, value: u64) -> Result<(), ErrorCode> {
+        Err(ErrorCode::NotSupported)
+    }
+
+    #[cfg(not(target_os = "windows"))]
     pub fn set_receive_buffer_size(&mut self, value: u64) -> Result<(), ErrorCode> {
         let fd = self.as_fd()?;
         if value == 0 {
@@ -471,12 +547,24 @@ impl TcpSocket {
         Ok(())
     }
 
+    #[cfg(target_os = "windows")]
+    pub fn send_buffer_size(&self) -> Result<u64, ErrorCode> {
+        Err(ErrorCode::NotSupported)
+    }
+
+    #[cfg(not(target_os = "windows"))]
     pub fn send_buffer_size(&self) -> Result<u64, ErrorCode> {
         let fd = self.as_fd()?;
         let v = sockopt::get_socket_send_buffer_size(fd)?;
         Ok(normalize_get_buffer_size(v).try_into().unwrap_or(u64::MAX))
     }
 
+    #[cfg(target_os = "windows")]
+    pub fn set_send_buffer_size(&mut self, value: u64) -> Result<(), ErrorCode> {
+        Err(ErrorCode::NotSupported)
+    }
+
+    #[cfg(not(target_os = "windows"))]
     pub fn set_send_buffer_size(&mut self, value: u64) -> Result<(), ErrorCode> {
         let fd = self.as_fd()?;
         if value == 0 {
